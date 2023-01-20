@@ -76,30 +76,32 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
 
   // check if email and password are valid
   const schema = joi.object({
+    name: joi.string().min(1).required(),
     email: joi.string().email().required(),
     password: joi.string().min(1).required(),
   });
-  const { error } = schema.validate({ email, password });
+
+  const { error } = schema.validate({ name, email, password });
   if (error) {
-    return res.status(400).send("Email or password is not valid");
+    return res.status(422).send("Erro de validação de dados");
   }
 
-  // check if email already exists
-  const user = await USERS_COLLECTION
-    .findOne({
-      email,
-    })
+  // check if email or name already exists
+  const user = await USERS_COLLECTION.findOne({
+    $or: [{ email }, { name }],
+  })
     .catch((err) => {
       console.log("Erro no findOne", err.message);
       return res.status(500).send("Internal server error");
-    });
-
+    })
+    ;
+  
   if (user) {
-    return res.status(400).send("Email already exists");
+    return res.status(400).send("Email or name already in use");
   }
 
   // hash password
@@ -111,6 +113,7 @@ app.post("/register", async (req, res) => {
 
   // create user
   await USERS_COLLECTION.insertOne({
+    name,
     email,
     password: hashedPassword,
     token,
