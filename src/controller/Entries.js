@@ -14,23 +14,20 @@ export async function newEntry(req, res) {
   console.log("Aqui está o token: ",token);
 
   
-
-
-
   const {value, description, type} = req.body;
 
   // check if description, value, type and token are valid
-  const schema = joi.object({
-    value: joi.number().min(1).required(),
-    description: joi.string().min(1).required(),
-    type: joi.string().valid("income", "expense").required(),
-    token: joi.string().min(1).required(),
-  });
+  // const schema = joi.object({
+  //   value: joi.number().min(1).required(),
+  //   description: joi.string().min(1).required(),
+  //   type: joi.string().valid("income", "expense").required(),
+  //   token: joi.string().min(1).required(),
+  // });
 
-  const { error } = schema.validate({value, description, type, token });
-  if (error) {
-    return res.status(422).send(error.details);
-  }
+  // const { error } = schema.validate({value, description, type, token });
+  // if (error) {
+  //   return res.status(422).send(error.details);
+  // }
 
   // check if token is valid
   const user = await SESSIONS_COLLECTION.findOne({
