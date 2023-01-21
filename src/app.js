@@ -124,7 +124,12 @@ app.post("/login", async (req, res) => {
 
 app.post("/entries" , async (req, res) => {
   //TEM QUE FAZER O TOKEN
-  const {value, description, type, token} = req.body;
+  const { authorization } = req.headers;
+  const token = authorization?.replace("Bearer ", "");
+  if (!token) return res.status(422).send("Informe o token!");
+  console.log(token);
+
+  const {value, description, type} = req.body;
 
   // check if description, value, type and token are valid
   const schema = joi.object({
@@ -136,7 +141,7 @@ app.post("/entries" , async (req, res) => {
 
   const { error } = schema.validate({value, description, type, token });
   if (error) {
-    return res.status(422).send("Erro de validação de dados");
+    return res.status(422).send(error.details);
   }
 
   // check if token is valid
@@ -171,9 +176,9 @@ app.post("/entries" , async (req, res) => {
   };
 
   if (type === "income") {
-    userEntry.balance += value;
+    userEntry.balance += Number(value);
   } else {
-    userEntry.balance -= value;
+    userEntry.balance -= Number(value);
   }
 
   userEntry.entries.push(newEntry);
