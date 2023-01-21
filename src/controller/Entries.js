@@ -9,10 +9,13 @@ const ENTRIES_COLLECTION = db.collection("entries");
 
 export async function newEntry(req, res) {
 
-  const { authorization } = req.headers;
-  const token = authorization?.replace("Bearer ", "");
-  if (!token) return res.status(422).send("Informe o token!");
-  console.log(token);
+ // get token from locals
+  const { token } = res.locals.session;
+  console.log("Aqui está o token: ",token);
+
+  
+
+
 
   const {value, description, type} = req.body;
 
